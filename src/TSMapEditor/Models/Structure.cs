@@ -155,9 +155,7 @@ namespace TSMapEditor.Models
         /// </summary>
         public bool IsBaseNodeDummy { get; set; }
 
-        public List<MapTile> LitTiles { get; set; } = new();
-
-        public void LightTiles(MapTile[][] tiles)
+        public override void LightTiles(MapTile[][] tiles)
         {
             ClearLitTiles();
 
@@ -173,38 +171,7 @@ namespace TSMapEditor.Models
 
             foreach (Point2D center in centers)
             {
-                Point2D centerPosition = Position + center;
-
-                int startX = Math.Max(centerPosition.X - radius, 0);
-                int endX = Math.Min(centerPosition.X + radius, tiles[0].Length - 1);
-                int startY = Math.Max(centerPosition.Y - radius, 0);
-                int endY = Math.Min(centerPosition.Y + radius, tiles.Length - 1);
-
-                for (int y = startY; y <= endY; y++)
-                {
-                    for (int x = startX; x <= endX; x++)
-                    {
-                        MapTile tile = tiles[y][x];
-
-                        if (tile == null)
-                            continue;
-
-                        int xDifference = centerPosition.X - x;
-                        int yDifference = centerPosition.Y - y;
-
-                        double distanceInCells = Math.Sqrt(xDifference * xDifference + yDifference * yDifference);
-                        double distanceInLeptons = distanceInCells * Constants.CellSizeInLeptons;
-
-                        if (distanceInLeptons > ObjectType.LightVisibility)
-                            continue;
-
-                        if (!litTiles.ContainsKey(tile) ||
-                            (litTiles.ContainsKey(tile) && litTiles[tile] > distanceInLeptons))
-                        {
-                            litTiles[tile] = distanceInLeptons;
-                        }
-                    }
-                }
+                LightTilesAt(center, radius, tiles, litTiles);
             }
 
             foreach (var kvp in litTiles)
@@ -213,16 +180,6 @@ namespace TSMapEditor.Models
             }
 
             LitTiles = litTiles.Keys.ToList();
-        }
-
-        public void ClearLitTiles()
-        {
-            foreach (var tile in LitTiles)
-            {
-                tile.LightSources.RemoveAll(source => source.Source == this);
-            }
-
-            LitTiles.Clear();
         }
 
         public void UpdatePowerUpAnims()

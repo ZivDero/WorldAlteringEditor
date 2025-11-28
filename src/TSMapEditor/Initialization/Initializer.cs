@@ -124,8 +124,18 @@ namespace TSMapEditor.Initialization
             return null;
         }
 
-        private void CommonTechnoInit(TechnoType technoType, IniFile rulesIni, IniSection section)
+        private void InitObjectType(GameObjectType objectType, IniFile rulesIni, IniSection section)
         {
+            // WW often made dumb typos where instead of a dot '.', they used a comma ',' in the values of lighting keys
+            objectType.LightRedTint = FloatTypoFix(section, "LightRedTint", objectType.LightRedTint);
+            objectType.LightGreenTint = FloatTypoFix(section, "LightGreenTint", objectType.LightGreenTint);
+            objectType.LightBlueTint = FloatTypoFix(section, "LightBlueTint", objectType.LightBlueTint);
+        }
+
+        private void InitTechnoType(TechnoType technoType, IniFile rulesIni, IniSection section)
+        {
+            InitObjectType(technoType, rulesIni, section);
+
             if (technoType.Primary == null)
                 technoType.Primary = FetchWeapon(rulesIni, section, "Primary");
 
@@ -153,18 +163,13 @@ namespace TSMapEditor.Initialization
         private void InitBuildingType(INIDefineable obj, IniFile rulesIni, IniSection section)
         {
             var buildingType = (BuildingType)obj;
-            CommonTechnoInit(buildingType, rulesIni, section);
+            InitTechnoType(buildingType, rulesIni, section);
 
             buildingType.RadialColor = section.KeyExists(nameof(buildingType.RadialColor)) ?
                 Helpers.ColorFromString(section.GetStringValue(nameof(buildingType.RadialColor), null)) : buildingType.RadialColor;
-
-            // WW often made dumb typos where instead of a dot '.', they used a comma ',' in the values of lighting keys
-            buildingType.LightRedTint = FloatTypoFix(buildingType, section, "LightRedTint", buildingType.LightRedTint);
-            buildingType.LightGreenTint = FloatTypoFix(buildingType, section, "LightGreenTint", buildingType.LightGreenTint);
-            buildingType.LightBlueTint = FloatTypoFix(buildingType, section, "LightBlueTint", buildingType.LightBlueTint);
         }
 
-        private double FloatTypoFix(BuildingType buildingType, IniSection section, string keyName, double current)
+        private double FloatTypoFix(IniSection section, string keyName, double current)
         {
             string value = section.GetStringValue(keyName, string.Empty);
             if (string.IsNullOrWhiteSpace(value))
@@ -178,17 +183,17 @@ namespace TSMapEditor.Initialization
 
         private void InitInfantryType(INIDefineable obj, IniFile rulesIni, IniSection section)
         {
-            CommonTechnoInit((TechnoType)obj, rulesIni, section);
+            InitTechnoType((TechnoType)obj, rulesIni, section);
         }
 
         public void InitUnitType(INIDefineable obj, IniFile rulesIni, IniSection section)
         {
-            CommonTechnoInit((TechnoType)obj, rulesIni, section);
+            InitTechnoType((TechnoType)obj, rulesIni, section);
         }
 
         private void InitAircraftType(INIDefineable obj, IniFile rulesIni, IniSection section)
         {
-            CommonTechnoInit((TechnoType)obj, rulesIni, section);
+            InitTechnoType((TechnoType)obj, rulesIni, section);
         }
 
         private static void InitArtConfigGeneric(IMap map, AbstractObject obj, IniFile artIni, IniSection artSection)

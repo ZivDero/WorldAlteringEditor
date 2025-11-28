@@ -32,6 +32,14 @@ namespace TSMapEditor.Models
         /// </summary>
         public List<string> AllowedTheaters { get; set; }
 
+        // Vinifera makes TerrainTypes have light sources, and their commmon ancestor with BuildingTypes
+        // is ObjectTypeClass, so these got moved here.
+        public double LightIntensity { get; set; }
+        public int LightVisibility { get; set; }
+        public double LightRedTint { get; set; }
+        public double LightGreenTint { get; set; }
+        public double LightBlueTint { get; set; }
+
         public bool IsValidForTheater(string theaterName)
         {
             if (AllowedTheaters == null || AllowedTheaters.Count == 0)

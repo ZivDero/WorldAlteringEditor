@@ -55,7 +55,7 @@ namespace TSMapEditor.Models
 
         public MapColor CellLighting { get; set; } = new MapColor(1.0, 1.0, 1.0);
 
-        public List<(Structure Source, double DistanceInLeptons)> LightSources { get; set; } = new();
+        public List<(GameObject Source, double DistanceInLeptons)> LightSources { get; set; } = new();
 
         public void RefreshLighting(Lighting lighting, LightingPreviewMode lightingPreviewMode, bool lightDisabledLightSources)
         {
@@ -91,20 +91,20 @@ namespace TSMapEditor.Models
             foreach (var source in LightSources)
             {
                 // Sources with intensity of 0.0 don't get any light applied
-                if (source.Source.ObjectType.LightIntensity == 0.0)
+                if (source.Source.GetObjectType().LightIntensity == 0.0)
                     continue;
 
-                if (!lightDisabledLightSources && !source.Source.Powered)
+                if (!lightDisabledLightSources && (source.Source is Structure && !((Structure)source.Source).Powered))
                     continue;
 
-                var buildingType = source.Source.ObjectType;
+                var buildingType = source.Source.GetObjectType();
 
-                double distanceRatio = 1.0 - (source.DistanceInLeptons / source.Source.ObjectType.LightVisibility);
+                double distanceRatio = 1.0 - (source.DistanceInLeptons / source.Source.GetObjectType().LightVisibility);
 
                 // Intensity modifies the cell ambient value.
                 // For example, if Ambient=0.5 and LightIntensity=1.0, in a cell that is fully
                 // lit by the light post, the overall ambient level becomes 0.5 + 1.0 = 1.5
-                cellAmbient += source.Source.ObjectType.LightIntensity * distanceRatio;
+                cellAmbient += source.Source.GetObjectType().LightIntensity * distanceRatio;
 
                 double redStrength;
                 double greenStrength;
